@@ -124,11 +124,6 @@ def img2arr_fromURLs(url_list, resize = False):
     return img_list
 
 
-
-
-
-
-
 # In[ ]:
 
 result = img2arr_fromURLs(df.iloc[0:5 , 0])
