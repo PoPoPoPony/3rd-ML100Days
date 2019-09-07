@@ -46,7 +46,7 @@ print(f'{len(num_features)} Numeric Features : {num_features}\n')
 df = df[num_features]
 df = df.fillna(-1)
 MMEncoder = MinMaxScaler()
-train_num = train_Y.shape[0]
+#train_num = train_Y.shape[0]
 print(df.head())
 
 
@@ -59,7 +59,7 @@ print(df.head())
 # 顯示 1stFlrSF 與目標值的散佈圖
 import seaborn as sns
 import matplotlib.pyplot as plt
-sns.regplot(x = df['1stFlrSF'][:train_num], y=train_Y)
+#sns.regplot(x = df['1stFlrSF'][:train_num], y=train_Y)
 plt.show()
 
 
@@ -83,7 +83,7 @@ train_X = MMEncoder.fit_transform(df)
 estimator = LinearRegression()
 print(cross_val_score(estimator, train_X, train_Y, cv=5).mean())
 
-sns.regplot(x = df['1stFlrSF'][:train_num], y=train_Y)
+#sns.regplot(x = df['1stFlrSF'][:train_num], y=train_Y)
 plt.show()
 
 # # 作業2
@@ -99,7 +99,7 @@ Your Code Here
 """
 keep = df['1stFlrSF'] < 3000
 df = df[keep]
-train_Y = train_Y[keep]
+#train_Y = train_Y[keep]
 
 
 # 做線性迴歸, 觀察分數
@@ -107,7 +107,7 @@ train_X = MMEncoder.fit_transform(df)
 estimator = LinearRegression()
 print(cross_val_score(estimator, train_X, train_Y, cv=5).mean())
 
-sns.regplot(x = df['1stFlrSF'][:train_num], y=train_Y)
+#sns.regplot(x = df['1stFlrSF'][:train_num], y=train_Y)
 plt.show()
 
 #在刪除離群值之後，發現回歸的效果變好了。
