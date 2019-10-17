@@ -14,9 +14,6 @@ from sklearn.metrics import classification_report
 
 
 
-
-
-
 digits = datasets.load_digits()
 
 
@@ -37,4 +34,3 @@ pred_Y = clf.predict(test_X)
 
 score = classification_report(test_Y , pred_Y)
 print(score)
-
