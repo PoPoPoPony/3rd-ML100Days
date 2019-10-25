@@ -7,12 +7,13 @@
 # https://www.kaggle.com/c/titanic/submit
 
 # # [作業目標]
-# - 試著模仿範例寫法, 在鐵達尼生存預測中, 觀察觀查混合泛化 (Blending) 的寫法與效果
+# - 試著模仿範例寫法, 在鐵達尼生存預測中, 觀查堆疊泛化 (Stacking) 的寫法與效果
 
 # # [作業重點]
-# - 觀察混合泛化的準確度 (In[14]), 是否比單一模型準確度為高 (In[11~13])  
-# - 除了我們的權重, 同學也可以試著自行調整權重 (注意:權重和=1), 看看有什麼影響
-# - Hint : 除了權重, 分類預測的調整, 還可以調整什麼地方?
+# - 完成堆疊泛化的寫作, 看看提交結果, 想想看 : 分類與回歸的堆疊泛化, 是不是也與混合泛化一樣有所不同呢?(In[14])  
+# 如果可能不同, 應該怎麼改寫會有較好的結果?  
+# - Hint : 請參考 mlxtrend 官方網站 StackingClassifier 的頁面說明 : Using Probabilities as Meta-Features
+# http://rasbt.github.io/mlxtend/user_guide/classifier/StackingClassifier/
 
 # In[1]:
 
@@ -126,7 +127,6 @@ df.drop(labels = ["Name"], axis = 1, inplace = True)
 # In[9]:
 
 
-# 確認缺值 與 目前的資料表內容
 na_check(df)
 df.head()
 
@@ -160,7 +160,7 @@ lr.fit(train_X, train_Y)
 lr_pred = lr.predict_proba(test_X)[:,1]
 sub = pd.DataFrame({'PassengerId': ids, 'Survived': lr_pred})
 sub['Survived'] = sub['Survived'].map(lambda x:1 if x>0.5 else 0) 
-sub.to_csv(os.getcwd() + "/3rd-ML100Days/practice/Day49/data/titanic_lr.csv", index=False) 
+sub.to_csv(os.getcwd() + '/3rd-ML100Days/practice/Day50/data/titanic_lr.csv', index=False) 
 
 
 # In[12]:
@@ -171,7 +171,7 @@ gdbt.fit(train_X, train_Y)
 gdbt_pred = gdbt.predict_proba(test_X)[:,1]
 sub = pd.DataFrame({'PassengerId': ids, 'Survived': gdbt_pred})
 sub['Survived'] = sub['Survived'].map(lambda x:1 if x>0.5 else 0) 
-sub.to_csv(os.getcwd() + '/3rd-ML100Days/practice/Day49/data/titanic_gdbt.csv', index=False)
+sub.to_csv(os.getcwd() + '/3rd-ML100Days/practice/Day50/data/titanic_gdbt.csv', index=False)
 
 
 # In[13]:
@@ -182,31 +182,38 @@ rf.fit(train_X, train_Y)
 rf_pred = rf.predict_proba(test_X)[:,1]
 sub = pd.DataFrame({'PassengerId': ids, 'Survived': rf_pred})
 sub['Survived'] = sub['Survived'].map(lambda x:1 if x>0.5 else 0) 
-sub.to_csv(os.getcwd() + '/3rd-ML100Days/practice/Day49/data/titanic_rf.csv', index=False)
+sub.to_csv(os.getcwd() + '/3rd-ML100Days/practice/Day50/data/titanic_rf.csv', index=False)
 
 
 # # 作業
-# * 雖然同樣是混合泛化，分類預測其實與回歸預測有相當多的差異性，
-# 因為鐵達尼預測的結果是 '生存/死亡'，輸出不是 0 就是 1  
-# 因此要用權重混合時，需要以以機率的形式混合，因此我們在作業前幾格當中，先幫各位同學把預測值寫成了機率的形式  
-# (請同學把下列程式完成，並將結果提交到 Kaggle 網站看看結果)
-# 
-# * 但是光是這樣，分類問題的混合泛化就能比單模預測還要好嗎?  
-# 已經快要期中考了，這裡請同學挑戰看看，還有沒有什麼方法可以改進混合泛化的結果?
+# * 分類預測的集成泛化, 也與回歸的很不一樣  
+# 既然分類的 Blending 要變成機率, 才比較容易集成,
+# 那麼分類的 Stacking 要讓第一層的模型輸出機率當特徵, 應該要怎麼寫呢?
 
 # In[ ]:
 
 
-# 混合泛化預測檔 
+from mlxtend.classifier import StackingClassifier
+
+meta_estimator = GradientBoostingClassifier(tol=100, subsample=0.70, n_estimators=50, 
+                                           max_features='sqrt', max_depth=4, learning_rate=0.3)
 """
 Your Code Here
 """
-blending_pred = lr_pred*0.3  + gdbt_pred*0.2 + rf_pred*0.5
-sub = pd.DataFrame({'PassengerId': ids, 'Survived': blending_pred})
-sub['Survived'] = sub['Survived'].map(lambda x:1 if x>0.5 else 0) 
-sub.to_csv(os.getcwd() + '/3rd-ML100Days/practice/Day49/data/titanic_blending.csv', index=False)
+stacking = StackingClassifier([lr , gdbt , rf] , meta_classifier = meta_estimator)
 
 
 # In[ ]:
+
+
+stacking.fit(train_X, train_Y)
+stacking_pred = stacking.predict(test_X)
+sub = pd.DataFrame({'PassengerId': ids, 'Survived': stacking_pred})
+sub.to_csv(os.getcwd() + '/3rd-ML100Days/practice/Day50/data/titanic_stacking.csv', index=False)
+
+
+# In[ ]:
+
+
 
 
